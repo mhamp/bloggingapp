@@ -10,7 +10,7 @@ import java.util.*;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.ResponseEntity.status;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -21,18 +21,20 @@ public class CommentsController {
 
     @PostMapping
     public ResponseEntity<Void> createComment(@RequestBody CommentsDto commentsDto) {
-        commentService.createComment(commentsDto);
+        commentService.save(commentsDto);
         return new ResponseEntity<>(CREATED);
     }
 
-    @GetMapping("/by-user/{postId}")
-    public ResponseEntity<List<CommentsDto>> getAllCommentsForPost(@RequestParam("postId") Long postId) {
-        return status(OK)
-                .body(commentService.getCommentByPost(postId));
+    @GetMapping("/by-post/{postId}")
+    public ResponseEntity<List<CommentsDto>> getAllCommentsForPost(@PathVariable Long postId) {
+        return ResponseEntity.status(OK)
+                .body(commentService.getAllCommentsForPost(postId));
     }
 
     @GetMapping("/by-user/{userName}")
-    public ResponseEntity<List<CommentsDto>> getAllCommentsByUser(@RequestParam("userName") String userName) {
-        return status(OK).body(commentService.getCommentsByUser(userName));
+    public ResponseEntity<List<CommentsDto>> getAllCommentsForUser(@PathVariable String userName){
+        return ResponseEntity.status(OK)
+                .body(commentService.getAllCommentsForUser(userName));
     }
+
 }

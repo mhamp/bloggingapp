@@ -12,8 +12,8 @@ import com.mhamp.bloggingapp.repository.UserRepository;
 import com.mhamp.bloggingapp.repository.VerificationTokenRepository;
 import com.mhamp.bloggingapp.security.JwtProvider;
 import lombok.AllArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+
 @Service
 @AllArgsConstructor
 @Transactional

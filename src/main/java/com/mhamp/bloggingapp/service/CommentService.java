@@ -32,32 +32,34 @@ public class CommentService {
     private final AuthService authService;
     private final MailContentBuilder mailContentBuilder;
     private final MailService mailService;
-    
-    public void createComment(CommentsDto commentsDto) {
+
+    public void save(CommentsDto commentsDto) {
         Post post = postRepository.findById(commentsDto.getPostId())
                 .orElseThrow(() -> new PostNotFoundException(commentsDto.getPostId().toString()));
         Comment comment = commentMapper.map(commentsDto, post, authService.getCurrentUser());
         commentRepository.save(comment);
-        String message = mailContentBuilder.build(post.getUser().getUsername() + " posted a comment on your post." + POST_URL);
+
+        String message = mailContentBuilder.build(authService.getCurrentUser() + " posted a comment on your post." + POST_URL);
         sendCommentNotification(message, post.getUser());
     }
-    public List<CommentsDto> getCommentByPost(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(postId.toString()));
+
+    private void sendCommentNotification(String message, User user) {
+        mailService.sendMail(new NotificationEmail(user.getUsername() + " Commented on your post", user.getEmail(), message));
+    }
+
+    public List<CommentsDto> getAllCommentsForPost(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId.toString()));
         return commentRepository.findByPost(post)
                 .stream()
-                .map(commentMapper::mapToDto)
-                .collect(toList());
+                .map(commentMapper::mapToDto).collect(toList());
     }
-    public List<CommentsDto> getCommentsByUser(String userName) {
+
+    public List<CommentsDto> getAllCommentsForUser(String userName) {
         User user = userRepository.findByUsername(userName)
                 .orElseThrow(() -> new UsernameNotFoundException(userName));
         return commentRepository.findAllByUser(user)
                 .stream()
                 .map(commentMapper::mapToDto)
                 .collect(toList());
-    }
-    private void sendCommentNotification(String message, User user) {
-        mailService.sendMail(new NotificationEmail(user.getUsername() + " Commented on your post", user.getEmail(), message));
     }
 }
